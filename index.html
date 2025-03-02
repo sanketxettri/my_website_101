@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Panda 🐼❤️</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+        }
+
+        /* Background Video */
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            background: rgba(255, 51, 102, 0.8);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            max-width: 600px;
+            margin: 10vh auto;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+            border: 3px solid #fff;
+        }
+
+        /* Title with font animation */
+        h1 {
+            color: #fff;
+            font-size: 45px;
+            font-family: 'Helvetica', sans-serif;
+            text-transform: uppercase;
+            animation: fadeInTitle 2s ease-in-out;
+        }
+
+        /* Sparkle Animation for Title */
+        @keyframes fadeInTitle {
+            0% { opacity: 0; transform: translateY(-50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Poll Game Sections */
+        .poll-game {
+            display: none;
+            text-align: center;
+        }
+
+        .question-box {
+            margin-top: 20px;
+        }
+
+        .poll-option {
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .poll-option:hover {
+            background-color: #ff0055;
+        }
+
+        /* Pop-up Content Style */
+        .hidden-content {
+            display: none;
+            margin-top: 30px;
+            background-color: #ff3366;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeInContent 1s ease-in-out;
+        }
+
+        /* Animation for content appearance */
+        @keyframes fadeInContent {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Custom Buttons and Styles */
+        .quiz button {
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .quiz button:hover {
+            background-color: #ff0055;
+        }
+
+        /* Message Box */
+        .message-box {
+            margin-top: 20px;
+        }
+
+        /* Text Area */
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-top: 10px;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 16px;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+    </style>
+</head>
+<body>
+    <video class="video-bg" autoplay loop muted>
+        <source src="/Users/sanketchhetri/Downloads/assests/VIDEO-2025-02-26-19-31-26.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="container">
+        <h1>Are you ready for the surprise, my Panda? 🐼❤️</h1>
+        
+        <div class="quiz">
+            <button onclick="startSurprise()">Yes! I'm ready!</button>
+            <button id="noBtn" onclick="moveNo()">No, not now!</button>
+        </div>
+
+        <div id="surpriseOptions" style="display:none;">
+            <h2>What would you like to do next?</h2>
+            <button onclick="openBox('journey')">Our Journey</button>
+            <button onclick="openBox('nickname')">Nicknames</button>
+            <button onclick="openBox('letter')">Love Letter</button>
+            <button onclick="startPollGame()">Poll Game</button>
+        </div>
+
+        <!-- Pop-up Content -->
+        <div id="journeyPopup" class="hidden-content"></div>
+        <div id="nicknamePopup" class="hidden-content"></div>
+        <div id="letterPopup" class="hidden-content"></div>
+
+        <!-- Poll Game Section -->
+        <div id="pollGame" class="poll-game">
+            <h2>Choose a category to start the game!</h2>
+            <button onclick="startCategory('love')">Love</button>
+            <button onclick="startCategory('heal')">Heal</button>
+            <button onclick="startCategory('spicy')">Spicy</button>
+
+            <div id="questions"></div>
+            <button id="nextQuestionBtn" onclick="nextQuestion()" style="display:none;">Next Question</button>
+        </div>
+
+        <!-- Message Box -->
+        <div class="message-box">
+            <textarea id="custom-message" placeholder="Leave a special message for me ❤️"></textarea>
+            <button onclick="showMessage()">Submit</button>
+            <p id="user-message"></p>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = '';
+        let currentQuestion = 0;
+        let selectedOption = null;
+
+        function startSurprise() {
+            document.querySelector('.quiz').style.display = 'none';
+            document.getElementById('surpriseOptions').style.display = 'block';
+        }
+
+        function moveNo() {
+            const noButton = document.getElementById('noBtn');
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            noButton.style.position = 'absolute';
+            noButton.style.left = x + 'px';
+            noButton.style.top = y + 'px';
+        }
+
+        function openBox(boxType) {
+            // Fireworks animation
+            let fireworks = document.createElement('div');
+            fireworks.className = 'fireworks';
+            document.body.appendChild(fireworks);
+            setTimeout(() => { fireworks.remove(); }, 1000);
+
+            // Hide surprise options
+            document.getElementById('surpriseOptions').style.display = 'none';
+
+            let content = '';
+            if (boxType === 'journey') {
+                content = '<h2>Our Journey</h2><ul><li>26/11/2023: Start Dating</li><li>27/01/2024: First Ullu</li><li>26/11/2024: First Anniversary</li></ul>';
+            } else if (boxType === 'nickname') {
+                content = '<h2>Nicknames</h2><ul><li>Panda</li><li>Pikachuu</li><li>Taukee</li><li>Dragon</li><li>Sweet Potato</li><li>Barderniiii</li></ul>';
+            } else if (boxType === 'letter') {
+                content = '<h2>Your Love Letter</h2><p class="love-letter"><p>Dear Babeee, Hi love, how are you? I’ve been thinking about you a lot and just wanted to remind you how much you mean to me. Every moment with you makes me so happy, and I feel so lucky to have you in my life. You really are everything I’ve always wanted and more. I know I’m not perfect, and I make mistakes, but I want you to know that I love you so much. You make me want to be a better person, and I’m grateful for every little thing you do. I love your smile, the way you laugh, and the way you care about everything. You make me feel so good, and I never want to take that for granted. I want to do whatever I can to make you happy. Whether it’s cooking for you, making you laugh, or just being there when you need someone. Your happiness is so important to me, and I just love seeing you smile. You mean everything to me. I love you more than words can say. You make me feel so special, and I’m so happy to share my life with you. I can’t wait for all the good times we’ll have together. You’re amazing, and I’m lucky to have you. I love you always and forever. Yours, Sanket</p>💖</p>';
+            }
+
+            // Display the content of the clicked box
+            document.getElementById(boxType + 'Popup').innerHTML = content;
+            document.getElementById(boxType + 'Popup').style.display = 'block';
+
+            // Show a "Close" button for the current box content to allow the user to choose another box
+            let closeButton = document.createElement('button');
+            closeButton.innerHTML = 'Close this surprise and choose another';
+            closeButton.onclick = () => {
+                document.getElementById(boxType + 'Popup').style.display = 'none';
+                document.getElementById('surpriseOptions').style.display = 'block'; // Show all boxes again
+            };
+            document.getElementById(boxType + 'Popup').appendChild(closeButton);
+        }
+
+        function showMessage() {
+            let message = document.getElementById('custom-message').value;
+            document.getElementById('user-message').innerHTML = message;
+        }
+
+        function startPollGame() {
+            document.getElementById('surpriseOptions').style.display = 'none'; // Hide options after selecting Poll Game
+            document.getElementById('pollGame').style.display = 'block'; // Show poll game options
+        }
+
+        function startCategory(category) {
+            currentCategory = category;
+            currentQuestion = 0;
+            loadQuestion(); // Start loading questions for the selected category
+        }
+
+        function loadQuestion() {
+            const questions = {
+                love: [
+                    { question: "What you want to be our next dating spot?", options: ["Home", "Restrudent", "Park", "Club"] },
+                    { question: "What make you happy with me?", options: ["Talking", "laughing", "Wlaking", "Eating"] },
+                    { question: "What's your idea of a perfect gift?", options: ["Jewelry", "Flowers", "Travel", "Food"] },
+                    { question: "When you are piss at workk what you want me to do?", options: ["Give Food", "Give Flowers", "Have a Sex", "Space"] },
+                    { question: "when you angry at me how long it take to clam or i can talk so you wont be that mad?", options: ["1 hours", "1 day", "2-3 days", "1 weeks"] },
+                    { question: "What’s the most irritating moment with me?", options: ["talking", "laughing", "racist", "nonsense talk"] },
+                    { question: "What do you do when stressed?", options: ["Listen to Music", "Sleep", "Talk with someone", "playing"] },
+                    { question: "How do you heal yourself after tired?", options: ["Sleep", "watching", "talking", "playing"] }
+                ],
+                heal: [
+                    { question: "What helps you relax?", options: ["Music", "Books", "Exercise", "food/travel"] },
+                    { question: "What you do when taking space with me?", options: ["Drink", "Music", "Sleep", "Watching"] },
+                    { question: "What’s the most irritating moment with me?", options: ["talking", "laughing", "racist", "nonsense talk"] },
+                    { question: "What do you do when stressed?", options: ["Listen to Music", "Sleep", "Talk with someone", "playing"] },
+                    { question: "How do you heal yourself after tired?", options: ["Sleep", "watching", "talking", "playing"] },
+                    { question: "What make you happy with me?", options: ["Talking", "laughing", "Wlaking", "Eating"] },
+                    { question: "What's your idea of a perfect gift?", options: ["Jewelry", "Flowers", "Travel", "Food"] },
+                    { question: "When you are piss at workk what you want me to do?", options: ["Give Food", "Give Flowers", "Have a Sex", "Space"] },
+                    { question: "when you angry at me how long it take to clam or i can talk so you wont be that mad?", options: ["1 hours", "1 day", "2-3 days", "1 weeks"] }
+                ],
+                spicy: [
+                    { question: "What part you loved about our sex without sex?", options: ["kissing", "teasingg", "playing", "Eating"] },
+                    { question: "What you loved me doing ?", options: ["playing with booobies", "kissing neck", "playing with ass", "playing with kiffyy"] },
+                    { question: "What you want to have next sex ?", options: ["Bed", "tabel", "bathroom", "Balcony"] },
+                    { question: "What you liked?", options: ["Simple", "Doimation", "Superior ", "All"] },
+                    { question: "What will make more fun?", options: ["me+dildo", "dildo", "roll", "roll and hand"] },
+                    { question: "is my roll enough?", options: ["Yess", "Noo", "Somehow", "neither yes neither no"] },
+                    { question: "Do you love being watch when playing or having sex?", options: ["Yess", "Noo", "Maybe", "idontknow"] },
+                    { question: "Do you like phone sex?", options: ["Yess", "Noo"] }
+                ]
+            };
+
+            let currentCategoryQuestions = questions[currentCategory];
+            if (currentQuestion < 8) {
+                let q = currentCategoryQuestions[currentQuestion];
+                let questionHTML = `<div class="question-box">
+                                        <p>${q.question}</p>
+                                        ${q.options.map((option, index) => `<button class="poll-option" onclick="selectOption(${index})">${option}</button>`).join('')}
+                                    </div>`;
+                document.getElementById('questions').innerHTML = questionHTML;
+                document.getElementById('nextQuestionBtn').style.display = 'none'; // Hide Next button initially
+            } else {
+                // Ask to choose the next category after finishing 5 questions
+                document.getElementById('questions').innerHTML = `
+                    <p>You've completed the questions! Choose a new category to play!</p>
+                    <button onclick="startCategory('love')">Love</button>
+                    <button onclick="startCategory('heal')">Heal</button>
+                    <button onclick="startCategory('spicy')">Spicy</button>
+                `;
+            }
+        }
+
+        function selectOption(optionIndex) {
+            const buttons = document.querySelectorAll('.poll-option');
+            buttons.forEach(button => button.style.backgroundColor = '');  // Reset background color
+            buttons[optionIndex].style.backgroundColor = '#ff0055';  // Highlight selected option
+            selectedOption = optionIndex;
+            document.getElementById('nextQuestionBtn').style.display = 'block'; // Show Next button after selecting option
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();  // Load next question
+            document.getElementById('nextQuestionBtn').style.display = 'none'; // Hide Next button again
+        }
+    </script>
+</body>
+</html>
